@@ -1,0 +1,97 @@
+<html lang="en">
+    <head>
+
+    </head>
+    <body>
+
+        <h1>My Custom Element</h1>
+        <style>
+            button {
+                background-color: pink;
+            }
+            my-button {
+                --my-button-padding: 20px;
+            }
+        </style>
+
+        <button>Regular Button</button>
+        <my-button text="Some Text"></my-button>
+        <my-button slot="slot"></my-button>
+        <input type="date">
+        <script>
+            class MyButton extends HTMLElement {
+                static observedAttributes=['text', 'disabled']
+
+                #shadowRoot;
+                #text = 'My Button';
+                #disabled;
+
+                get text() {
+                    return this.#text;
+                }
+
+                set text(value) {
+                    this.#text = value;
+                    this.#render(); // to re-render components when the text changes
+                }
+
+                get disabled() {
+                    return this.#disabled;
+                }
+
+                set disabled(value) {
+                    this.#disabled = value;
+                    this.#render(); // to re-render components when the disabled state changes
+                }
+
+                set disabled(value) {
+                    this.#disabled = value;
+                    this.#render(); // to re-render components when the disabled state changes
+                }
+
+                constructor() {
+                    super();
+                    this.#shadowRoot = this.attachShadow({mode: 'open'})
+                }
+
+                connectedCallback() {
+                    this.#render();
+                }
+
+                attributeChangedCallback(name, oldVal, newVal) {
+                    if (name === 'text') {
+                        this.text = newVal;
+                    } else if (name === 'disabled') {
+                        this.disabled = newVal !== null;
+                    }
+                    this.#render();
+                }
+
+                #render() {
+                    this.shadowRoot.innerHTML = `
+                        <style>
+                            :host { // whatever the shadowroot is attached to, useful to isolate variables we dont want affected by global vars
+                                --my-button-padding: 8px;
+                            }
+                            button {
+                                background-color: blue;
+                                padding: var(--my-button-padding);
+                            }
+                        </style>
+                        <button ${this.disabled ? 'disabled' : ''}>
+                            <slot>
+                                ${this.text}
+                            </slot>
+                        </button>
+                    `
+                }
+
+                log() {
+                    console.log('Logged...')
+                }
+            }
+
+            customElements.define('my-button', MyButton);
+        </script>
+    </body>
+</html>
